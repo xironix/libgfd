@@ -1,7 +1,9 @@
 # GoFile Downloader
 
-> This script is a utility for downloading files from GoFile.io, supporting both
+> This script is a utility for downloading files from GoFile, supporting both
 public and password-protected albums.
+
+![Demo](https://github.com/Lysagxra/GoFileDownloader/blob/45eb080468efce402d4e74e5d5b71dcf5b1eac79/misc/Demo.gif)
 
 ## Features
 
