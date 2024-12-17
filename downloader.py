@@ -54,6 +54,7 @@ class Downloader:
         self.password = password
         self.max_workers = max_workers
         self.token = get_account_token()
+        os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
         os.chdir(DOWNLOAD_FOLDER)
 
     def download_item(self, current_task, file_info):
