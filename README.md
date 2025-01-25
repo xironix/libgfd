@@ -9,7 +9,7 @@ public and password-protected albums.
 
 - Downloads multiple files from an album concurrently.
 - Supports [batch downloading](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#batch-download) via a list of URLs.
-- Supports [downloading password-protected](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#password-protected-album-download) albums by providing a password.
+- Supports [downloading password-protected albums](https://github.com/Lysagxra/GoFileDownloader?tab=readme-ov-file#password-protected-album-download) by providing a password.
 - Progress indication during downloads.
 - Automatically creates a directory structure for organized storage.
 - Logs URLs that encounter errors for troubleshooting.
