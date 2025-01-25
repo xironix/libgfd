@@ -7,8 +7,10 @@ from urllib.parse import urlencode
 
 import requests
 
-GOFILE_API = "https://api.gofile.io"
-GOFILE_API_ACCOUNTS = "https://api.gofile.io/accounts"
+from .config import (
+    GOFILE_API,
+    GOFILE_API_ACCOUNTS
+)
 
 def get_content_id(url):
     """
