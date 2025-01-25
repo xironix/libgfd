@@ -26,17 +26,18 @@ public and password-protected albums.
 project-root/
 ├── helpers/
 │ ├── managers/
-│ │ ├── live_manager.py        # Manages a real-time live display
-│ │ ├── log_manager.py         # Manages real-time log updates
-│ │ └── progress_manager.py    # Manages progress bars
-│ ├── download_utils.py        # Utilities for managing the download process
-│ ├── file_utils.py            # Utilities for managing file operations
-│ ├── general_utils.py         # Miscellaneous utility functions
-│ └── gofile_utils.py          # Utilities for checking GoFile status and URL validation
-├── downloader.py              # Module for initiating downloads from specified GoFile URLs
-├── main.py                    # Main script to run the downloader
-├── URLs.txt                   # Text file listing album URLs to be downloaded
-└── session_log.txt            # Log file for recording session details
+│ │ ├── live_manager.py      # Manages a real-time live display
+│ │ ├── log_manager.py       # Manages real-time log updates
+│ │ └── progress_manager.py  # Manages progress bars
+│ ├── config.py              # Manages constants and settings used across the project
+│ ├── download_utils.py      # Utilities for managing the download process
+│ ├── file_utils.py          # Utilities for managing file operations
+│ ├── general_utils.py       # Miscellaneous utility functions
+│ └── gofile_utils.py        # Utilities for checking GoFile status and URL validation
+├── downloader.py            # Module for initiating downloads from specified GoFile URLs
+├── main.py                  # Main script to run the downloader
+├── URLs.txt                 # Text file listing album URLs to be downloaded
+└── session_log.txt          # Log file for recording session details
 ```
 
 ## Installation
