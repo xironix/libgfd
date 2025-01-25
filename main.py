@@ -15,9 +15,16 @@ Usage:
 import os
 import sys
 
-from helpers.file_utils import read_file, write_file
 from helpers.general_utils import clear_terminal
-from downloader import initialize_managers, handle_download_process
+from helpers.file_utils import (
+    read_file,
+    write_file
+)
+
+from downloader import (
+    handle_download_process,
+    initialize_managers
+)
 
 FILE = os.path.join(os.getcwd(), "URLs.txt")
 
@@ -34,6 +41,7 @@ def process_urls(urls):
         with live_manager.live:
             for url in urls:
                 handle_download_process(url, live_manager)
+            live_manager.stop()
 
     except KeyboardInterrupt:
         sys.exit(1)
