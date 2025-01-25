@@ -18,10 +18,16 @@ import requests
 from helpers.managers.live_manager import LiveManager
 from helpers.managers.log_manager import LoggerTable
 from helpers.managers.progress_manager import ProgressManager
+
 from helpers.download_utils import save_file_with_progress
-from helpers.general_utils import create_download_directory, clear_terminal
+from helpers.general_utils import (
+    create_download_directory,
+    clear_terminal
+)
 from helpers.gofile_utils import (
-    get_content_id, get_account_token, generate_content_url,
+    get_content_id,
+    get_account_token,
+    generate_content_url,
     check_response_status
 )
 
@@ -54,6 +60,7 @@ class Downloader:
         self.password = password
         self.max_workers = max_workers
         self.token = get_account_token()
+
         os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
         os.chdir(DOWNLOAD_FOLDER)
 
@@ -128,7 +135,7 @@ class Downloader:
 
         return headers
 
-    def parse_links(self, _id, files_info, password=None):
+    def parse_links(self, identifier, files_info, password=None):
         """
         Parses the content URL for file links and populates a list with file
         information.
@@ -146,7 +153,7 @@ class Downloader:
                 and data.get("passwordStatus") != "passwordOk"
             )
 
-        content_url = generate_content_url(_id, password=password)
+        content_url = generate_content_url(identifier, password=password)
 
         headers = self._prepare_headers(include_auth=True)
         response = requests.get(
@@ -188,7 +195,7 @@ class Downloader:
         else:
             append_file_info(files_info, data)
 
-    def init_download(self):
+    def initialize_download(self):
         """
         Initiates the download process by requesting the content and starting
         the download.
@@ -214,26 +221,6 @@ class Downloader:
             description=content_id, num_tasks=len(files_info)
         )
         self.run_in_parallel(content_directory, files_info)
-
-def setup_parser():
-    """
-    Sets up and returns an argument parser for downloading content from a
-    specified URL.
-
-    Returns:
-        argparse.ArgumentParser: The configured argument parser with the
-                                 defined arguments.
-    """
-    parser = argparse.ArgumentParser(
-        description="Download content from a specified URL."
-    )
-    parser.add_argument(
-        "url", nargs="?", type=str, help="The URL to download from."
-    )
-    parser.add_argument(
-        "password", nargs="?", type=str, help="The password for the download."
-    )
-    return parser
 
 def handle_download_process(url, live_manager, password=None):
     """
@@ -262,7 +249,7 @@ def handle_download_process(url, live_manager, password=None):
         live_manager=live_manager,
         password=password
     )
-    downloader.init_download()
+    downloader.initialize_download()
 
 def initialize_managers():
     """
@@ -278,6 +265,26 @@ def initialize_managers():
     logger_table = LoggerTable()
     return LiveManager(progress_manager, logger_table)
 
+def setup_parser():
+    """
+    Sets up and returns an argument parser for downloading content from a
+    specified URL.
+
+    Returns:
+        argparse.ArgumentParser: The configured argument parser with the
+                                 defined arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Download content from a specified URL."
+    )
+    parser.add_argument(
+        "url", nargs="?", type=str, help="The URL to download from."
+    )
+    parser.add_argument(
+        "password", nargs="?", type=str, help="The password for the download."
+    )
+    return parser
+
 def main():
     """
     This function processes command-line arguments to download an album from a
@@ -291,15 +298,17 @@ def main():
     clear_terminal()
     parser = setup_parser()
     args = parser.parse_args()
+    live_manager = initialize_managers()
 
     try:
-        live_manager = initialize_managers()
         with live_manager.live:
             handle_download_process(
                 args.url,
                 live_manager,
                 password=args.password
             )
+            live_manager.stop()
+
     except KeyboardInterrupt:
         sys.exit(1)
 
