@@ -1,4 +1,5 @@
-"""
+"""Main module of the project.
+
 This module provides functionality for reading URLs from a file, processing
 them to download anime content, and clearing the file after the process is
 complete.
@@ -12,51 +13,39 @@ Usage:
         3. Clear the contents of 'URLs.txt' after all URLs have been processed.
 """
 
-import os
 import sys
+from pathlib import Path
 
+from downloader import handle_download_process, initialize_managers
+from helpers.config import URLS_FILE
+from helpers.file_utils import read_file, write_file
 from helpers.general_utils import clear_terminal
-from helpers.file_utils import (
-    read_file,
-    write_file
-)
 
-from downloader import (
-    handle_download_process,
-    initialize_managers
-)
+FILE_PATH = Path.cwd() / URLS_FILE
 
-FILE = os.path.join(os.getcwd(), "URLs.txt")
 
-def process_urls(urls):
-    """
-    Validates and downloads items for a list of URLs.
-
-    Args:
-        urls (list): A list of URLs to process.
-    """
+def process_urls(urls: list[str]) -> None:
+    """Validate and downloads items for a list of URLs."""
     live_manager = initialize_managers()
 
     try:
         with live_manager.live:
             for url in urls:
                 handle_download_process(url, live_manager)
+
             live_manager.stop()
 
     except KeyboardInterrupt:
         sys.exit(1)
 
-def main():
-    """
-    Main function to execute the script.
 
-    Reads URLs from a file, processes the downloads for each URL, and clears
-    the file after the processing is complete.
-    """
+def main() -> None:
+    """Run the script."""
     clear_terminal()
-    urls = read_file(FILE)
+    urls = read_file(FILE_PATH)
     process_urls(urls)
-    write_file(FILE)
+    write_file(FILE_PATH)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
