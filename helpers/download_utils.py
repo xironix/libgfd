@@ -1,21 +1,17 @@
-"""
-This module provides utilities for handling file downloads with progress
-tracking.
-"""
+"""Utilities for handling file downloads with progress tracking."""
 
-KB = 1024
-MB = 1024 * KB
+import logging
+from pathlib import Path
 
-def get_chunk_size(file_size):
-    """
-    Determines the optimal chunk size based on the file size.
+from requests import Response
 
-    Args:
-        file_size (int): The size of the file in bytes.
+from helpers.managers.progress_manager import ProgressManager
 
-    Returns:
-        int: The optimal chunk size in bytes.
-    """
+from .config import KB, MB
+
+
+def get_chunk_size(file_size: int) -> int:
+    """Determine the optimal chunk size based on the file size."""
     thresholds = [
         (1 * MB, 8 * KB),      # Less than 1 MB
         (10 * MB, 16 * KB),    # 1 MB to 10 MB
@@ -28,32 +24,24 @@ def get_chunk_size(file_size):
         if file_size < threshold:
             return chunk_size
 
-    return 1 * MB
+    return 512 * KB
 
-def save_file_with_progress(response, download_path, task, progress_manager):
-    """
-    Saves the file from the response to the specified path while updating
-    the download progress.
 
-    Args:
-        response (Response): The response object containing the file data.
-        download_path (str): The path where the file will be saved.
-        task (Task): The task object representing the current download task.
-        progress_manager (ProgressManager): An object responsible for managing
-                                            and updating task progress.
-
-    Raises:
-        ValueError: If the content length is not provided in the response
-                    headers.
-    """
+def save_file_with_progress(
+    response: Response,
+    download_path: str,
+    task: int,
+    progress_manager: ProgressManager,
+) -> None:
+    """Save the file from the response to the specified path."""
     file_size = int(response.headers.get("Content-Length", -1))
     if file_size == -1:
-        raise ValueError("Content length not provided in response headers.")
+        logging.exception("Content length not provided in response headers.")
 
     chunk_size = get_chunk_size(file_size)
     total_downloaded = 0
 
-    with open(download_path, 'ab') as file:
+    with Path(download_path).open("wb") as file:
         for chunk in response.iter_content(chunk_size=chunk_size):
             if chunk is not None:
                 file.write(chunk)

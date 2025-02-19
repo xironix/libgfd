@@ -1,59 +1,40 @@
-"""
-This module provides utility functions for interacting with the GoFile API.
-"""
+"""Module that provides utility functions for interacting with the GoFile API."""
 
+from __future__ import annotations
+
+import logging
 import sys
 from urllib.parse import urlencode
 
 import requests
 
-from .config import (
-    GOFILE_API,
-    GOFILE_API_ACCOUNTS
-)
+from .config import GOFILE_API, GOFILE_API_ACCOUNTS, HTTP_STATUS_OK
 
-def get_content_id(url):
-    """
-    Extracts and returns the content ID from a GoFile URL.
 
-    Args:
-        url (str): The GoFile URL from which to extract the content ID.
-
-    Returns:
-        str or None: The content ID if the URL is valid, or None if the URL is
-                     invalid or the ID cannot be found.
-    """
+def get_content_id(url: str) -> str | None:
+    """Extract and returns the content ID from a GoFile URL."""
     try:
-        if url.split('/')[-2] != 'd':
-            print(f"Missing ID for URL: {url}")
+        if url.split("/")[-2] != "d":
+            message = f"Missing ID for URL: {url}"
+            logging.error(message)
             return None
 
-        return url.split('/')[-1]
+        return url.split("/")[-1]
 
     except IndexError:
-        print(f"{url} is not a valid GoFile URL.")
+        message = f"{url} is not a valid GoFile URL."
+        logging.exception(message)
         return None
 
-def generate_content_url(content_id, password=None):
-    """
-    Builds a URL for accessing content, optionally including a password as a
-    query parameter.
 
-    Args:
-        content_id (str): The unique identifier of the content to be accessed.
-        password (str, optional): The password required to access the content,
-                                  if any. Default is None.
-
-    Returns:
-        str: The generated URL for accessing the content, with or without the
-             password query parameter.
-    """
+def generate_content_url(content_id: str, password: str | None = None) -> None:
+    """Generate a URL for accessing content, optionally including a password."""
     base_url = f"{GOFILE_API}/contents/{content_id}?wt=4fd6sg89d7s6&cache=true"
 
     # Only add the password if it's provided
     query_params = {}
     if password:
-        query_params['password'] = password
+        query_params["password"] = password
 
     # If there are additional query parameters, append them
     if query_params:
@@ -61,43 +42,27 @@ def generate_content_url(content_id, password=None):
 
     return base_url
 
-def check_response_status(response, filename):
-    """
-    Checks if the server response is valid based on status codes.
 
-    Args:
-        response (requests.Response): The HTTP response object to be validated.
-        filename (str): The name of the file being downloaded, used for
-                        logging.
-
-    Returns:
-        bool: True if the response is valid, False otherwise.
-    """
+def check_response_status(response: requests.Response, filename: str) -> bool:
+    """Check if the server response is valid based on status codes."""
     is_invalid_status_code = (
         response.status_code in (403, 404, 405, 500)
-        or response.status_code != 200
+        or response.status_code != HTTP_STATUS_OK
     )
 
     if is_invalid_status_code:
-        print(
-            f"Invalid response for {filename}. "
-            f"Status code: {response.status_code}"
+        message = (
+             f"Invalid response for {filename}. "
+            "Status code: {response.status_code}"
         )
+        logging.error(message)
         return False
 
     return True
 
-def get_account_token():
-    """
-    Retrieves the access token for the created account.
 
-    Returns:
-        str: The access token of the created account.
-
-    Raises:
-        SystemExit: If the account creation fails, the function prints an error
-                    message and exits the program.
-    """
+def get_account_token() -> str:
+    """Retrieve the access token for the created account."""
     headers = {
         "User-Agent": "Mozilla/5.0",
         "Accept-Encoding": "gzip, deflate, br",
@@ -108,11 +73,11 @@ def get_account_token():
     account_response = requests.post(
         GOFILE_API_ACCOUNTS,
         headers=headers,
-        timeout=10
+        timeout=10,
     ).json()
 
     if account_response["status"] != "ok":
-        print("Account creation failed.")
+        logging.error("Account creation failed.")
         sys.exit(1)
 
     return account_response["data"]["token"]
